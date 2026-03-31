@@ -177,5 +177,10 @@ mysql --defaults-extra-file=.my.cnf < database.sql
 
 ## 👥 Auteurs
 
-Projet réalisé par le groupe – BUT MMI S6, option développement  
-[lucasl0](https://github.com/lucasl0) 
+Projet réalisé par le groupe – BUT MMI S6, option développement
+
+| Pseudonyme | Profil GitHub |
+|---|---|
+| lucasl0 | [github.com/lucasl0](https://github.com/lucasl0) |
+| Badiane95 | [github.com/Badiane95](https://github.com/Badiane95) |
+| ShaunQ0 | [github.com/ShaunQ0](https://github.com/ShaunQ0) |
