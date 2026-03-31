@@ -168,7 +168,8 @@ jobs:
 
       - name: Write SSH key to file
         run: |
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 400 ~/.ssh/deploy_key
 
       - name: Deploy via rsync
