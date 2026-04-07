@@ -29,9 +29,15 @@ export default defineConfig({
         ),
     },
     server: {
-        // Expose the server to the network allowing access from ip address
         host: true,
         open: true,
+        proxy: {
+            "/api": {
+                target: "https://tyradex.vercel.app",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, "/api"),
+            },
+        },
     },
     test: {
         exclude: [
