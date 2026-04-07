@@ -35,7 +35,7 @@ export default defineConfig({
             "/api": {
                 target: "https://tyradex.vercel.app",
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, "/api"),
+                secure: true,
             },
         },
     },
