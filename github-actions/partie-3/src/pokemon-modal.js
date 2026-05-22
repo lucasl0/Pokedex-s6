@@ -7,14 +7,10 @@ import {
     fetchPokemon,
     fetchEvolutionChain,
     fetchAbilityData,
-    fetchTCGCards,
 } from "#api";
-
-import WaveSurfer from "wavesurfer.js";
 
 import {
     FRENCH_GAMES_NAME,
-    POKEDEX,
     cleanString,
     clearTagContent,
     replaceImage,
@@ -37,7 +33,7 @@ import {
 
 import modalPulldownClose from "#src/modal-pulldown-close.js"
 
-import { listPokemon, setTitleTagForGeneration, hasReachPokedexEnd, rippleEffect, loadPokedexForGeneration } from "./main";
+import { listPokemon, setTitleTagForGeneration, hasReachPokedexEnd, rippleEffect } from "./main";
 import loadingImage from "/images/loading.svg";
 import loadingImageRaw from "/images/loading.svg?raw";
 
@@ -72,33 +68,6 @@ const loadGenerationBtn = document.querySelector("[data-load-generation]");
 const dataCache = {};
 let listAbilitiesCache = [];
 const initialPageTitle = document.title;
-
-const initialFavicon = document.querySelector("[data-favicon]")?.href;
-const themeColorMeta = document.querySelector("[data-theme-color]");
-const initialThemeColor = themeColorMeta?.content || "#0f172a";
-
-let wavesurfer = null;
-
-const setFavicon = (url) => {
-    const link = document.querySelector("[data-favicon]");
-    if (link) link.href = url;
-};
-
-const setThemeColor = (color) => {
-    if (themeColorMeta) themeColorMeta.content = color;
-};
-
-const newModalDom = {
-    foreignNames: modal?.querySelector("[data-foreign-names]"),
-    pokepediaLink: modal?.querySelector("[data-pokepedia-link]"),
-    cryContainer: modal?.querySelector("[data-cry-container]"),
-    playCryBtn: modal?.querySelector("[data-play-cry]"),
-    tcgDetails: modal?.querySelector("[data-tcg-details]"),
-    listTcgCards: modal?.querySelector("[data-list-tcg-cards]"),
-    nbTcgCards: modal?.querySelector("[data-nb-tcg-cards]"),
-    listPokedexNumbers: modal?.querySelector("[data-list-pokedex-numbers]"),
-    listGamesEl: modal?.querySelector("[data-list-games]"),
-};
 
 let listTypes = await fetchAllTypes();
 listTypes = listTypes.map((item) => ({
@@ -150,9 +119,6 @@ modal.addEventListener("close", async (e) => {
     modal.dataset.isClosing = false;
     modal_DOM.img.src = loadingImage;
     modal_DOM.img.alt = "";
-    setFavicon(initialFavicon);
-    setThemeColor(initialThemeColor);
-    if (wavesurfer) { wavesurfer.stop(); }
     setTitleTagForGeneration();
 
     document.querySelectorAll(".selected").forEach((item) => {
@@ -268,14 +234,6 @@ displayModal = async (pkmnData) => {
             pkmnData = await fetchPokemon(pkmnData.pokedex_id);
         }
     }
-
-    const pkmnGeneration = Number(pkmnData.generation);
-    const nextGenToLoad = Number(loadGenerationBtn.dataset.loadGeneration);
-    if (pkmnGeneration > 0 && pkmnGeneration >= nextGenToLoad) {
-        for (let gen = nextGenToLoad; gen <= pkmnGeneration; gen++) {
-            await loadPokedexForGeneration(gen);
-        }
-    }
     modal.dataset.pokemonData = JSON.stringify(pkmnData);
     document.title = `Chargement - ${initialPageTitle}`;
 
@@ -374,20 +332,6 @@ displayModal = async (pkmnData) => {
     modal_DOM.pkmnName.textContent = `#${String(pkmnData.pokedex_id).padStart(NB_NUMBER_INTEGERS_PKMN_ID, '0')} ${pkmnData.name.fr}`;
     document.title = `${modal_DOM.pkmnName.textContent} - ${initialPageTitle}`;
 
-    setFavicon(pkmnData.sprites.regular);
-
-    if (newModalDom.foreignNames) {
-        newModalDom.foreignNames.textContent = [
-            pkmnData.name.en ? `EN: ${pkmnData.name.en}` : null,
-            pkmnData.name.jp ? `JP: ${pkmnData.name.jp}` : null,
-        ].filter(Boolean).join(" · ");
-    }
-
-    if (newModalDom.pokepediaLink) {
-        const pokepediaName = pkmnData.name.fr.replace(/\s+/g, "_");
-        newModalDom.pokepediaLink.href = `https://www.pokepedia.fr/${encodeURIComponent(pokepediaName)}`;
-    }
-
     if (listDescriptions?.is_legendary || listDescriptions?.is_mythical) {
         const cloneHighlight = document.importNode(
             pkmnHighlightTemplateRaw.content,
@@ -444,7 +388,6 @@ displayModal = async (pkmnData) => {
     const firstBorderColor = window.getComputedStyle(document.body).getPropertyValue(`--type-${cleanString(pkmnData.types[0].name)}`);
     const secondaryBorderColor = window.getComputedStyle(document.body).getPropertyValue(`--type-${cleanString(pkmnData.types[1]?.name || "")}`);
 
-    setThemeColor(firstBorderColor.trim() || initialThemeColor);
     modal.style.borderTopColor = firstBorderColor;
     modal.style.color = `rgb(from ${firstBorderColor} r g b / 0.4)`;
     modal.style.borderLeftColor = firstBorderColor;
@@ -772,29 +715,9 @@ displayModal = async (pkmnData) => {
 
     listGames.forEach((item) => {
         const li = document.createElement("li");
-        li.classList.add("flex", "items-center", "gap-2", "py-1");
-        const versionName = FRENCH_GAMES_NAME[item.version.name] || item.version.name;
+        const versionName = FRENCH_GAMES_NAME[item.version.name] || "Unknown";
+        li.textContent = versionName;
 
-        const img = document.createElement("img");
-        img.alt = versionName;
-        img.loading = "lazy";
-        img.className = "w-10 h-10 object-contain rounded shrink-0";
-        const extensions = ["png", "jpg", "avif", "webp"];
-        let extIdx = 0;
-        const tryNextExt = () => {
-            if (extIdx < extensions.length) {
-                img.src = `/jaquettes/${item.version.name}.${extensions[extIdx++]}`;
-                img.onerror = tryNextExt;
-            } else {
-                img.hidden = true;
-            }
-        };
-        tryNextExt();
-
-        const span = document.createElement("span");
-        span.textContent = versionName;
-
-        li.append(img, span);
         modal_DOM.listGames.append(li);
     });
     modal_DOM.nbGames.textContent = ` (${listGames.length})`;
@@ -896,84 +819,7 @@ displayModal = async (pkmnData) => {
     modal_DOM.statistics.append(statName);
     modal_DOM.statistics.append(statValue);
 
-    if (newModalDom.listPokedexNumbers) {
-        clearTagContent(newModalDom.listPokedexNumbers);
-        const pokedexNumbers = listDescriptions?.pokedex_numbers || [];
-
-        const knownDexIds = Object.keys(POKEDEX);
-        pokedexNumbers
-            .filter((entry) => knownDexIds.includes(entry.pokedex.name))
-            .forEach((entry) => {
-                const li = document.createElement("li");
-                li.className = "flex justify-between bg-slate-50 rounded px-2 py-1 text-sm";
-                const dexName = POKEDEX[entry.pokedex.name];
-                li.innerHTML = `<span class="font-medium">${dexName}</span><span class="font-mono">#${String(entry.entry_number).padStart(NB_NUMBER_INTEGERS_PKMN_ID, "0")}</span>`;
-                newModalDom.listPokedexNumbers.append(li);
-            });
-
-        const detailsEl = newModalDom.listPokedexNumbers.closest("details");
-        if (detailsEl) detailsEl.inert = newModalDom.listPokedexNumbers.children.length === 0;
-    }
-
-    if (newModalDom.listTcgCards && newModalDom.tcgDetails) {
-        clearTagContent(newModalDom.listTcgCards);
-        const tcgCards = await fetchTCGCards(pkmnData.pokedex_id);
-        newModalDom.nbTcgCards.textContent = tcgCards.length ? ` (${tcgCards.length})` : "";
-        newModalDom.tcgDetails.inert = tcgCards.length === 0;
-
-        tcgCards.slice(0, 12).forEach((card) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.title = card.name || pkmnData.name.fr;
-            btn.className = "group relative";
-            const img = document.createElement("img");
-            img.src = `${card.image}/low.jpg`;
-            img.alt = card.name || pkmnData.name.fr;
-            img.loading = "lazy";
-            img.className = "w-24 rounded hocus:scale-105 transition-transform shadow-sm";
-            img.onerror = () => { btn.hidden = true; };
-            btn.append(img);
-
-            btn.addEventListener("click", () => {
-                const overlay = document.createElement("div");
-                overlay.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/60";
-                overlay.addEventListener("click", () => overlay.remove());
-                const bigImg = document.createElement("img");
-                bigImg.src = `${card.image}/high.jpg`;
-                bigImg.alt = card.name || pkmnData.name.fr;
-                bigImg.className = "max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl";
-                overlay.append(bigImg);
-                document.body.append(overlay);
-            });
-
-            newModalDom.listTcgCards.append(btn);
-        });
-    }
-
-    if (pkmnExtraData?.cries?.latest && newModalDom.cryContainer) {
-        newModalDom.cryContainer.hidden = false;
-        const waveformEl = document.getElementById("waveform");
-        if (waveformEl) {
-            if (wavesurfer) { wavesurfer.destroy(); wavesurfer = null; }
-            const typeColor = firstBorderColor.trim() || "#4F4A85";
-            wavesurfer = WaveSurfer.create({
-                container: waveformEl,
-                waveColor: typeColor,
-                progressColor: `color-mix(in srgb, ${typeColor} 60%, black)`,
-                url: pkmnExtraData.cries.latest,
-                height: 60,
-                barWidth: 2,
-                barGap: 1,
-                barRadius: 2,
-            });
-            wavesurfer.on("ready", () => wavesurfer.play());
-        }
-        if (newModalDom.playCryBtn) {
-            newModalDom.playCryBtn.onclick = () => wavesurfer?.play();
-        }
-    } else if (newModalDom.cryContainer) {
-        newModalDom.cryContainer.hidden = true;
-    }
+    console.log("Current Pokemon's data", pkmnData);
 
     loadGenerationBtn.inert = hasReachPokedexEnd;
 
