@@ -412,3 +412,5 @@ export const FRENCH_GAMES_NAME = {
     "lets-go-pikachu": "Pokémon Let's Go, Pikachu",
     "legends-arceus": "Légendes Pokémon : Arceus",
 };
+
+export const getVersionForName = FRENCH_GAMES_NAME;

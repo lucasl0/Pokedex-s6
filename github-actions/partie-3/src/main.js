@@ -25,6 +25,10 @@ import "#src/window-events.js";
 
 import "#src/styles/main.css";
 
+const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || "";
+const GITHUB_REPO_OWNER = import.meta.env.VITE_GITHUB_OWNER || "Badiane95";
+const GITHUB_REPO_NAME = import.meta.env.VITE_GITHUB_REPO || "Pokedex-s6";
+
 if ('paintWorklet' in CSS) {
     CSS.paintWorklet.addModule(ripple);
 }
@@ -260,6 +264,16 @@ const loadPokedexForGeneration = async (generation = 1, triggerElement) => {
             const pkmnNameContainer = clone.querySelector("[data-pkmn-name]")
             pkmnNameContainer.textContent = `#${String(item.pokedex_id).padStart(NB_NUMBER_INTEGERS_PKMN_ID, '0')}\n${item.name.fr}`;
 
+            const typesList = clone.querySelector("[data-pokemon-types]");
+            item.types.forEach((type) => {
+                const li = document.createElement("li");
+                li.className = "type-name py-0.5 px-1.5 rounded text-xs";
+                li.style.backgroundColor = `var(--type-${cleanString(type.name)})`;
+                li.textContent = type.name;
+                li.setAttribute("aria-label", `Type ${type.name}`);
+                typesList.append(li);
+            });
+
             const aTag = clone.querySelector("[data-pokemon-data]");
             aTag.href = url;
             aTag.style.scrollMargin = `${headerPokedex.offsetHeight}px`;
@@ -392,8 +406,67 @@ window.addEventListener("offline", () => {
 
 export { loadPokedexForGeneration };
 
+const loadGithubMembers = async () => {
+    const membersContainer = document.querySelector("[data-github-members]");
+    if (!membersContainer) return;
+
+    try {
+        const headers = GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {};
+        const res = await fetch(
+            `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/collaborators`,
+            { headers }
+        );
+        if (!res.ok) throw new Error("collaborators fetch failed");
+
+        const collaborators = await res.json();
+        const userDetails = await Promise.all(
+            collaborators.map((c) =>
+                fetch(`https://api.github.com/users/${c.login}`, { headers }).then((r) => r.json())
+            )
+        );
+
+        membersContainer.innerHTML = "";
+        userDetails.forEach((user) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <a href="${user.html_url}" target="_blank" rel="noopener noreferrer"
+                   class="flex items-center gap-2 hocus:text-blue-600 transition-colors">
+                    <img src="${user.avatar_url}" alt="Avatar de ${user.login}" class="w-8 h-8 rounded-full" />
+                    <span>
+                        ${user.name ? `<strong>${user.name}</strong> · ` : ""}
+                        <span class="font-mono text-xs">@${user.login}</span>
+                    </span>
+                </a>
+            `;
+            membersContainer.append(li);
+        });
+    } catch (_e) {
+        const fallbackMembers = [
+            { login: "lucasl0", url: "https://github.com/lucasl0" },
+            { login: "Badiane95", url: "https://github.com/Badiane95" },
+            { login: "ShaunQ0", url: "https://github.com/ShaunQ0" },
+        ];
+        membersContainer.innerHTML = "";
+        fallbackMembers.forEach(({ login, url }) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs hocus:text-blue-600">@${login}</a>`;
+            membersContainer.append(li);
+        });
+    }
+};
+
+const deployInfo = document.querySelector("[data-deploy-info]");
+if (deployInfo) {
+    const actor = import.meta.env.VITE_ACTOR;
+    const buildDate = import.meta.env.VITE_BUILD_DATE;
+    if (actor && buildDate) {
+        deployInfo.textContent = `Déployé par ${actor} le ${new Date(buildDate).toLocaleString("fr-FR")}`;
+    }
+}
+
 await observeURL();
 await loadPokedexForGeneration(1);
+loadGithubMembers();
 
 if (pkmnId !== null) {
     const $itemInList = document.querySelector(`[data-pokemon-id="${pkmnId}"]`);

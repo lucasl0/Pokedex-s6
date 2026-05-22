@@ -145,6 +145,9 @@ jobs:
         env:
           VITE_ACTOR: ${{ github.actor }}
           VITE_BUILD_DATE: ${{ github.event.repository.updated_at }}
+          VITE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_GITHUB_OWNER: ${{ github.repository_owner }}
+          VITE_GITHUB_REPO: ${{ github.event.repository.name }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@master
@@ -174,7 +177,13 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -Pav \
+          rsync -Pav --delete \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             ./dist/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:www/
+
+      - name: Protect .env files on server
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} \
+            "chmod 600 www/.env 2>/dev/null || true"

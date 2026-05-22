@@ -23,10 +23,11 @@
                 </button>
             </div>
         </div>
-        <header class="py-2 bg-slate-900 text-white">
+        <header class="pkmn-header py-2 text-white">
             <div class="mr-[max(env(safe-area-inset-right),_theme(space.3))] ml-[max(env(safe-area-inset-left),_theme(space.3))]">
-                <div class="mx-auto max-w-6xl">
-                    <h1>Pokédex v%VERSION% - TP CI/CD</h1>
+                <div class="mx-auto max-w-6xl flex items-center gap-3">
+                    <div class="pokeball-icon" aria-hidden="true"></div>
+                    <h1 class="pkmn-title">Pokédex v%VERSION%</h1>
                 </div>
             </div>
         </header>
@@ -121,16 +122,16 @@
         <template data-tpl-id="pokedex">
             <header
                 data-header-pokedex
-                class="sticky -top-[1px] border-black border-b-2 bg-slate-50 p-3 z-50 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))]"
+                class="pkmn-gen-header sticky -top-[1px] bg-white p-3 z-50 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))]"
             >
                 <div class="mx-auto max-w-6xl flex justify-between">
                     <div>
-                        <h2 class="text-3xl">
-                            Génération <span data-generation-number></span>
+                        <h2 class="text-3xl font-black tracking-tight">
+                            Génération <span data-generation-number class="pkmn-gen-number"></span>
                         </h2>
                         <p
                             data-generation-range
-                            class="py-0.5 px-2 rounded-md bg-slate-600 text-white inline-flex"
+                            class="pkmn-range-badge py-0.5 px-2 rounded-md inline-flex text-sm font-mono"
                         ></p>
                     </div>
                     <div class="flex gap-y-1 gap-x-2 items-center">

@@ -193,7 +193,7 @@ export const onTransitionsEnded = (node) => {
 
 export const modal = document.querySelector("[data-pokemon-modal]");
 
-export const modal_DOM = {
+export const modal_DOM = modal ? {
     pkmnName: modal.querySelector("h2"),
     img: modal.querySelector("img"),
     category: modal.querySelector("[data-category]"),
@@ -225,7 +225,7 @@ export const modal_DOM = {
     acronymVersions: modal.querySelector("[data-pkmn-acronym-versions]"),
     noEvolutionsText: modal.querySelector("[data-no-evolutions]"),
     listTogglePip: modal.querySelectorAll("[data-toggle-picture-in-picture]"),
-};
+} : {};
 
 export * from "./colors";
 export * from "./pokemon-modal.utils";

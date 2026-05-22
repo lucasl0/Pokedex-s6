@@ -36,3 +36,12 @@ export const fetchAbilityData = async (url) => {
     }
 }
 
+export const fetchPokedexNumbers = async (pkmnId) => {
+    try {
+        const req = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pkmnId}`);
+        return req.data.pokedex_numbers || [];
+    } catch (_e) {
+        return [];
+    }
+}
+
