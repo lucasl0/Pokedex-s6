@@ -65,14 +65,13 @@ jobs:
 
       - name: Run unit tests
         run: npm run test
-        continue-on-error: true
 
       - name: Upload Vitest HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vitest-report
-          path: github-actions/partie-3/html
+          path: github-actions/partie-3/vitest-report
           retention-days: 7
 
   # ─────────────────────────────────────────
@@ -127,8 +126,6 @@ jobs:
     defaults:
       run:
         working-directory: github-actions/partie-3
-    env:
-      SECRETS_CONTEXT: ${{ toJson(secrets) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -155,17 +152,17 @@ jobs:
           VITE_BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           EOF
 
-      - name: Protéger .env via .htaccess
+      - name: Build project
+        run: npm run build
+
+      - name: Protéger .env via .htaccess dans dist/
         run: |
-          cat > .htaccess << 'EOF'
+          cat > dist/.htaccess << 'EOF'
           <FilesMatch "^\.env">
             Order allow,deny
             Deny from all
           </FilesMatch>
           EOF
-
-      - name: Build project
-        run: npm run build
 
       - name: Déployer via rsync SSH
         run: |
@@ -179,21 +176,23 @@ jobs:
             dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/html/
 
       - name: Migration base de données
+        env:
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_SERVER: ${{ secrets.MYSQL_SERVER }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         run: |
-          MYSQL_USER=$(echo $SECRETS_CONTEXT | jq -r '.MYSQL_USER')
-          MYSQL_PASSWORD=$(echo $SECRETS_CONTEXT | jq -r '.MYSQL_PASSWORD')
-          MYSQL_SERVER=$(echo $SECRETS_CONTEXT | jq -r '.MYSQL_SERVER')
-          MYSQL_DATABASE=$(echo $SECRETS_CONTEXT | jq -r '.MYSQL_DATABASE')
-          cat > .my.cnf << EOF
-          [client]
-          user=$MYSQL_USER
-          password=$MYSQL_PASSWORD
-          database=$MYSQL_DATABASE
-          host=$MYSQL_SERVER
-          EOF
-          chmod 400 .my.cnf
           if [ -f database.sql ]; then
+            cat > .my.cnf << EOF
+          [client]
+          user=${MYSQL_USER}
+          password=${MYSQL_PASSWORD}
+          database=${MYSQL_DATABASE}
+          host=${MYSQL_SERVER}
+          EOF
+            chmod 400 .my.cnf
             mysql --defaults-extra-file=.my.cnf < database.sql
+            rm -f .my.cnf
           fi
 
       - name: Afficher le dernier déployeur

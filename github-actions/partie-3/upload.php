@@ -42,6 +42,7 @@ $games = [
 ];
 
 $uploadDir = __DIR__ . "/public/jaquettes/";
+$maxSize = 5 * 1024 * 1024; // 5 Mo
 $success = null;
 $error = null;
 
@@ -62,6 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Jeu invalide sélectionné.";
     } elseif (!$file || $file["error"] !== UPLOAD_ERR_OK) {
         $error = "Erreur lors de l'upload du fichier.";
+    } elseif ($file["size"] > $maxSize) {
+        $error = "Fichier trop volumineux (max 5 Mo).";
     } else {
         $allowedTypes = ["image/jpeg", "image/png", "image/webp"];
         $mimeType = mime_content_type($file["tmp_name"]);

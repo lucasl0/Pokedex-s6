@@ -119,6 +119,7 @@ const FALLBACK_TYPES = [
     { sprites: {}, name: { fr: "Ténèbres",  en: "dark"     } },
     { sprites: {}, name: { fr: "Acier",     en: "steel"    } },
     { sprites: {}, name: { fr: "Fée",       en: "fairy"    } },
+    { sprites: {}, name: { fr: "Stellaire", en: "stellar"  } },
 ];
 
 let rawTypes;

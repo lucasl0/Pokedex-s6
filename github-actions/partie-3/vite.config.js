@@ -52,7 +52,7 @@ export default defineConfig({
         css: false,
         reporters: ['verbose', 'html'],
         outputFile: {
-            html: './vitest-report/index.html'
+            html: 'vitest-report/index.html',
         },
     },
 });
