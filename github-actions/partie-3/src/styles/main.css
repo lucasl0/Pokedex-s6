@@ -998,3 +998,17 @@ footer > section {
     scrollbar-color: var(--pkmn-red) #f0f0f0;
     scrollbar-width: thin;
 }
+
+/* ===========================
+   Container Queries — Types Pokémon en mode liste (sans JS)
+   =========================== */
+
+/* Mode liste : carte étroite → afficher les types */
+@container pokemon (max-width: 20rem) {
+    .pokemon-types {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-top: 0.25rem;
+    }
+}
