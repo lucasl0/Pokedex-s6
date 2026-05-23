@@ -12,3 +12,4 @@
 // Copiez la ligne ci-dessous à la fin de src/utils/pokemon-mapping.js :
 
 // export const getVersionForName = (name) => FRENCH_GAMES_NAME[name] ?? name;
+export const getVersionForName = (name) => FRENCH_GAMES_NAME[name] ?? name; 
