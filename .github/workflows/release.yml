@@ -65,7 +65,6 @@ jobs:
 
       - name: Run unit tests
         run: npm run test
-        continue-on-error: true
 
       # Rapport HTML Vitest — toujours généré (if: always())
       - name: Upload Vitest HTML report
@@ -73,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vitest-report
-          path: github-actions/partie-3/html
+          path: github-actions/partie-3/vitest-report
           retention-days: 7
 
   # ─────────────────────────────────────────
@@ -115,7 +114,7 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Protect .env via .htaccess
+      - name: Protect .env via .htaccess dans dist/
         run: |
           cat > dist/.htaccess << 'HTEOF'
           <FilesMatch "^\.env">
@@ -212,8 +211,27 @@ jobs:
             dist/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/html/pokedex/
 
+      - name: Migration base de données
+        env:
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_SERVER: ${{ secrets.MYSQL_SERVER }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+        run: |
+          if [ -f database.sql ]; then
+            cat > .my.cnf << EOF
+          [client]
+          user=${MYSQL_USER}
+          password=${MYSQL_PASSWORD}
+          database=${MYSQL_DATABASE}
+          host=${MYSQL_SERVER}
+          EOF
+            chmod 400 .my.cnf
+            mysql --defaults-extra-file=.my.cnf < database.sql
+            rm -f .my.cnf
+          fi
+
       - name: Log deploy info
         run: |
-          echo "Deploye par : ${{ github.actor }}"
-          echo "Date        : $(date -u +'%Y-%m-%d %H:%M UTC')"
+          echo "✅ Déployé par : ${{ github.actor }} le $(date +'%d/%m/%Y à %H:%M:%S')"
           echo "Commit SHA  : ${{ github.sha }}"

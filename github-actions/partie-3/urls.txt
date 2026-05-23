@@ -1,0 +1,2 @@
+URL du projet GitHub : https://github.com/lucasl0/Pokedex-s6
+URL du site déployé  : https://

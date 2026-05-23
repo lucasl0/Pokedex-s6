@@ -17,6 +17,11 @@ export const fetchPokemonForGeneration = async (generation = 1) => {
 
         return listPokemon;
     } catch (error) {
+        // 402 Payment Required : API Tyradex indisponible (payante)
+        const httpStatus = error?.response?.status ?? error?.cause?.status;
+        if (httpStatus === 402) {
+            throw new Error("API unavailable", { cause: { status: 402, apiUnavailable: true } });
+        }
         throw new Error("", { cause: error?.cause });
     }
 };

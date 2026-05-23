@@ -1,0 +1,36 @@
+<!-- 
+    tcg-wavesurfer-html.html
+    Templates HTML à insérer dans src/index.html, à l'intérieur de <dialog>,
+    après la section "Apparitions" existante.
+-->
+
+<!-- Section Cartes TCG -->
+<section aria-labelledby="tcg-title" class="modal-section">
+    <h3 id="tcg-title" class="modal-section-title">
+        Cartes TCG
+        <span data-nb-tcg-cards class="badge">0 carte</span>
+    </h3>
+    <details data-tcg-details>
+        <summary>Voir les cartes</summary>
+        <ul
+            data-list-tcg-cards
+            class="tcg-cards-grid"
+            aria-label="Liste des cartes TCG"
+            role="list"
+        ></ul>
+    </details>
+</section>
+
+<!-- Section Spectre sonore -->
+<section aria-labelledby="cry-title" class="modal-section">
+    <h3 id="cry-title" class="modal-section-title">Cri du Pokémon</h3>
+    <div data-cry-container aria-live="polite"></div>
+    <button
+        data-play-cry
+        type="button"
+        class="btn-play-cry"
+        aria-label="Rejouer le cri du Pokémon"
+    >
+        ▶ Rejouer
+    </button>
+</section>

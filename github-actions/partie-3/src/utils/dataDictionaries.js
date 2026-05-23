@@ -413,4 +413,4 @@ export const FRENCH_GAMES_NAME = {
     "legends-arceus": "Légendes Pokémon : Arceus",
 };
 
-export const getVersionForName = FRENCH_GAMES_NAME;
+export const getVersionForName = (name) => FRENCH_GAMES_NAME[name] ?? name;

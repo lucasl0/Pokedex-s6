@@ -26,7 +26,7 @@ import "#src/window-events.js";
 import "#src/styles/main.css";
 
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || "";
-const GITHUB_REPO_OWNER = import.meta.env.VITE_GITHUB_OWNER || "Badiane95";
+const GITHUB_REPO_OWNER = import.meta.env.VITE_GITHUB_OWNER || "lucasl0";
 const GITHUB_REPO_NAME = import.meta.env.VITE_GITHUB_REPO || "Pokedex-s6";
 
 if ('paintWorklet' in CSS) {
@@ -335,12 +335,15 @@ const loadPokedexForGeneration = async (generation = 1, triggerElement) => {
             hasReachPokedexEnd = true;
 
             errorMessageContainer.textContent = "Impossible d'afficher cette génération, car elle n'existe pas.";
+        } else if (error?.cause?.apiUnavailable || error?.cause?.status === 402) {
+            errorMessageContainer.textContent = "L'API Pokémon est temporairement indisponible. Veuillez réessayer dans quelques instants.";
+            listLoadGenerationBtns.forEach((item) => item.inert = false);
         } else {
             console.error(error);
-            errorMessageContainer.textContent = "Une erreur est survenue.";
+            errorMessageContainer.textContent = "Une erreur est survenue lors du chargement du Pokédex.";
             listLoadGenerationBtns.forEach((item) => item.inert = false);
         }
-        errorPopover.dataset.error = POPOVER_ERRORS.unknown;
+        errorPopover.dataset.error = POPOVER_ERRORS.lost_connection;
         errorPopover.showPopover();
     }
 };
@@ -413,10 +416,10 @@ const loadGithubMembers = async () => {
     try {
         const headers = GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {};
         const res = await fetch(
-            `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/collaborators`,
+            `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contributors`,
             { headers }
         );
-        if (!res.ok) throw new Error("collaborators fetch failed");
+        if (!res.ok) throw new Error("contributors fetch failed");
 
         const collaborators = await res.json();
         const userDetails = await Promise.all(
@@ -460,7 +463,7 @@ if (deployInfo) {
     const actor = import.meta.env.VITE_ACTOR;
     const buildDate = import.meta.env.VITE_BUILD_DATE;
     if (actor && buildDate) {
-        deployInfo.textContent = `Déployé par ${actor} le ${new Date(buildDate).toLocaleString("fr-FR")}`;
+        deployInfo.textContent = `Déployé par ${actor} — build #${buildDate}`;
     }
 }
 

@@ -10,7 +10,6 @@ import loadingImageRaw from "/images/loading.svg?raw";
 export const pkmnHighlightTemplateRaw = typeof document !== 'undefined'
     ? document.querySelector("[data-tpl-id='pokemon-highlight']")
     : null;
-
 export const createSensibility = async (template, data, listTypes) => {
     const typeData = listTypes.find(
         (type) => cleanString(type.name.fr) === cleanString(data.name)

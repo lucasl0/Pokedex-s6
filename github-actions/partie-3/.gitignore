@@ -28,9 +28,13 @@ dist-ssr
 .env.*
 !.env.example
 
-# Rapport HTML Vitest (ne pas commiter)
-html/
+# Playwright
+/test-results/
+/tests-examples/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
-# Rapport HTML Playwright (ne pas commiter)
-playwright-report/
-test-results/
+# Rapports HTML (ne pas commiter — consigne prof)
+/vitest-report/
+/html/

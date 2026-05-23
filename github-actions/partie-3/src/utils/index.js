@@ -1,8 +1,9 @@
 export const cleanString = (string) =>
-    string
+    String(string ?? "")
         .toLowerCase()
         .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "");
+        .replace(/\p{Diacritic}/gu, "")
+        .replace(/\s+/g, "-");
 
 export const clearTagContent = (tag) => {
     while (tag.firstChild) {

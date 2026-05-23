@@ -33,7 +33,7 @@ export default defineConfig({
         open: true,
         proxy: {
             "/api": {
-                target: "https://tyradex.vercel.app",
+                target: "https://tyradex.app",
                 changeOrigin: true,
                 secure: true,
             },
@@ -50,11 +50,11 @@ export default defineConfig({
         ],
         environment: 'happy-dom',
         css: false,
-        // Reporter HTML Vitest – génère le rapport dans ./html/
+        // Reporter HTML Vitest – génère le rapport dans ./vitest-report/
         // Ne pas commiter ce dossier (ajouté dans .gitignore)
         reporters: ['verbose', 'html'],
         outputFile: {
-            html: './html/index.html',
+            html: 'vitest-report/index.html',
         },
     },
 });

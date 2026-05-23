@@ -100,8 +100,35 @@ const newModalDom = {
     listGamesEl: modal?.querySelector("[data-list-games]"),
 };
 
-let listTypes = await fetchAllTypes();
-listTypes = listTypes.map((item) => ({
+const FALLBACK_TYPES = [
+    { sprites: {}, name: { fr: "Normal",    en: "normal"   } },
+    { sprites: {}, name: { fr: "Feu",       en: "fire"     } },
+    { sprites: {}, name: { fr: "Eau",       en: "water"    } },
+    { sprites: {}, name: { fr: "Plante",    en: "grass"    } },
+    { sprites: {}, name: { fr: "Électrik",  en: "electric" } },
+    { sprites: {}, name: { fr: "Glace",     en: "ice"      } },
+    { sprites: {}, name: { fr: "Combat",    en: "fighting" } },
+    { sprites: {}, name: { fr: "Poison",    en: "poison"   } },
+    { sprites: {}, name: { fr: "Sol",       en: "ground"   } },
+    { sprites: {}, name: { fr: "Vol",       en: "flying"   } },
+    { sprites: {}, name: { fr: "Psy",       en: "psychic"  } },
+    { sprites: {}, name: { fr: "Insecte",   en: "bug"      } },
+    { sprites: {}, name: { fr: "Roche",     en: "rock"     } },
+    { sprites: {}, name: { fr: "Spectre",   en: "ghost"    } },
+    { sprites: {}, name: { fr: "Dragon",    en: "dragon"   } },
+    { sprites: {}, name: { fr: "Ténèbres",  en: "dark"     } },
+    { sprites: {}, name: { fr: "Acier",     en: "steel"    } },
+    { sprites: {}, name: { fr: "Fée",       en: "fairy"    } },
+    { sprites: {}, name: { fr: "Stellaire", en: "stellar"  } },
+];
+
+let rawTypes;
+try {
+    rawTypes = await fetchAllTypes();
+} catch {
+    rawTypes = FALLBACK_TYPES;
+}
+let listTypes = rawTypes.map((item) => ({
     sprite: item.sprites,
     name: {
         fr: cleanString(item.name.fr),

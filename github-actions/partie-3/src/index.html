@@ -65,31 +65,39 @@
                 Charger la génération suivante
             </button>
             <section class="max-w-6xl mx-auto mt-8 border-t border-slate-200 pt-6 pb-4 text-sm text-slate-600">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <!-- Équipe -->
                     <div>
                         <h2 class="font-bold text-slate-900 mb-2">Équipe</h2>
                         <ul class="flex flex-col gap-2" data-github-members>
                             <li class="text-slate-400 text-xs">Chargement…</li>
                         </ul>
                     </div>
+                    <!-- Crédits -->
                     <div>
                         <h2 class="font-bold text-slate-900 mb-2">Crédits</h2>
                         <ul class="flex flex-col gap-1">
-                            <li>APIs : <a href="https://tyradex.vercel.app" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">Tyradex</a>, <a href="https://pokeapi.co" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">PokéAPI</a>, <a href="https://tcgdex.net" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">TCGdex</a></li>
-                            <li>Icônes : <a href="https://github.com/partywhale/pokemon-type-icons" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">pokemon-type-icons</a></li>
+                            <li>APIs : <a href="https://tyradex.app" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">Tyradex</a>, <a href="https://pokeapi.co" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">PokéAPI</a>, <a href="https://tcgdex.dev" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">TCGdex</a></li>
+                            <li>Icônes : <a href="https://github.com/partywhale/pokemon-type-icons" target="_blank" rel="noopener" class="text-blue-600 hocus:underline">pokemon-type-icons</a></li>
                         </ul>
-                        <div class="mt-3 flex items-center gap-3">
-                            <img
-                                src="/images/logo-iut.svg"
-                                alt="Logo CY IUT Cergy-Pontoise"
-                                class="h-10 object-contain"
-                                width="81"
-                                height="40"
-                                loading="lazy"
-                            />
-                            <span>BUT MMI – Développement Web &amp; Dispositif Interactif &middot; 2024–2025</span>
-                        </div>
                         <p class="mt-2 text-xs text-slate-400" data-deploy-info></p>
+                    </div>
+                    <!-- Logo université -->
+                    <div class="flex flex-col items-start gap-1">
+                        <a href="https://www.cyu.fr" target="_blank" rel="noopener noreferrer" aria-label="CY Cergy Paris Université">
+                            <picture>
+                                <source srcset="/images/cy-cergy-paris-universite.svg" type="image/svg+xml" />
+                                <img
+                                    src="/images/cy-cergy-paris-universite.png"
+                                    alt="Logo CY Cergy Paris Université"
+                                    width="160"
+                                    height="60"
+                                    loading="lazy"
+                                    class="max-w-[160px] h-auto"
+                                />
+                            </picture>
+                        </a>
+                        <span class="text-xs text-slate-500 mt-1">BUT MMI – Développement Web &amp; Dispositif Interactif · 2024–2025</span>
                     </div>
                 </div>
             </section>
