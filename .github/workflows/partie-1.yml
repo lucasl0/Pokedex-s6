@@ -17,18 +17,8 @@ jobs:
         run: printf "Hello ${{ github.actor }} ! 🥳"
 
       - name: List files in the repository
-        uses: actions/checkout@v4
-<<<<<<< Updated upstream
-        
-=======
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> dcec8f50ee01ebcda81b52044748a4bd215c32ec
->>>>>>> Stashed changes
-      - name: List files
-        run: ls ${{ github.workspace }}
+        run: | # Le pipe (|) permet d'écrire du texte multilignes
+          ls ${{ github.workspace }}
 
       - name: Ma commande Linux personnalisée
         run: |
