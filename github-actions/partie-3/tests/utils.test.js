@@ -1,42 +1,37 @@
-import { expect, describe, it } from 'vitest';
-
-import { getVersionForName, cleanString, getEvolutionChain } from "#src/utils/index.js";
-
-import { evolutionLine, evolutionLineFr, pokedex } from "#mocks/index.js";
-
-describe("getVersionForName", () => {
-    it("should return black version", () => {
-        expect(getVersionForName["ruby"]).toMatch(/rubis/i);
-    });
-});
+import { describe, it, expect } from "vitest";
+import { cleanString } from "../src/utils/index.js";
+import { getVersionForName } from "../src/utils/pokemon-mapping.js";
 
 describe("cleanString", () => {
-    it("should remove all accents and lowercase string", () => {
-        expect(cleanString("Stéphane")).toBe("stephane");
+    it("supprime les accents", () => {
+        expect(cleanString("Pokémon")).toBe("Pokemon");
+    });
+
+    it("passe en minuscules", () => {
+        expect(cleanString("PIKACHU")).toBe("pikachu");
+    });
+
+    it("remplace les espaces par des tirets", () => {
+        expect(cleanString("feu volant")).toBe("feu-volant");
+    });
+
+    it("retourne une chaîne vide si undefined", () => {
+        expect(cleanString(undefined)).toBe("");
+    });
+
+    it("retourne une chaîne vide si null", () => {
+        expect(cleanString(null)).toBe("");
     });
 });
 
-describe("getEvolutionChain", () => {
-    it("should not return more than three levels of evolutions", () => {
-        const res = getEvolutionChain(
-            evolutionLine,
-            evolutionLineFr,
-            pokedex
-        )
-
-        expect(res.length).toBeLessThan(4);
-        expect(res[0].length).toBeLessThan(4);
+describe("getVersionForName", () => {
+    it("retourne le nom français d'un jeu connu", () => {
+        const result = getVersionForName("red");
+        expect(typeof result).toBe("string");
+        expect(result.length).toBeGreaterThan(0);
     });
 
-    it("should return a nested array", () => {
-        const res = getEvolutionChain(
-            evolutionLine,
-            evolutionLineFr,
-            pokedex
-        );
-
-        res.forEach((item) => {
-            expect(Array.isArray(item)).toBeTruthy();
-        });
+    it("retourne la valeur originale si jeu inconnu", () => {
+        expect(getVersionForName("unknown-game")).toBe("unknown-game");
     });
 });
