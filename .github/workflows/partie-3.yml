@@ -144,7 +144,7 @@ jobs:
         run: npm run build
         env:
           VITE_ACTOR: ${{ github.actor }}
-          VITE_BUILD_DATE: ${{ github.event.repository.updated_at }}
+          VITE_BUILD_DATE: ${{ github.run_id }}
           VITE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_GITHUB_OWNER: ${{ github.repository_owner }}
           VITE_GITHUB_REPO: ${{ github.event.repository.name }}
@@ -182,8 +182,8 @@ jobs:
             ./dist/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:www/
 
-      - name: Protect .env files on server
+      - name: Create .htaccess to block .env files
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} \
-            "chmod 600 www/.env 2>/dev/null || true"
+            "echo -e '<Files .env>\nOrder allow,deny\nDeny from all\n</Files>' > www/.htaccess"
