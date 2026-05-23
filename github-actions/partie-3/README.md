@@ -1,191 +1,155 @@
-# Pokedex S6 - BUT MMI Developpement Web
+# 🎮 Pokédex S6 – BUT MMI Développement Web & Dispositif Interactif
 
-> Projet realise dans le cadre du devoir note de S6 - Developpement Web et dispositif interactif (BUT MMI, option developpement).
+> Projet réalisé dans le cadre du devoir noté de S6 – Développement Web et dispositif interactif (BUT MMI, option développement).
 
----
-
-## Membres du groupe
+## 👥 Équipe
 
 | Pseudonyme | Profil GitHub |
-|---|---|
+|------------|---------------|
 | lucasl0 | [github.com/lucasl0](https://github.com/lucasl0) |
 | Badiane95 | [github.com/Badiane95](https://github.com/Badiane95) |
 | ShaunQ0 | [github.com/ShaunQ0](https://github.com/ShaunQ0) |
 
 ---
 
-## Mise en place du projet
+## 🛠️ Outils à installer
 
-### Prerequis
+- [Node.js](https://nodejs.org/) v20+
+- [npm](https://www.npmjs.com/) v9+
+- PHP 8+ (pour `upload.php` – back-end jaquettes)
+- Un serveur SSH (pour le déploiement via rsync)
+- Un serveur MySQL/MariaDB (si migration BDD activée)
 
-- Node.js >= 20
-- npm >= 9
+---
 
-### Installation
+## 🚀 Installation
 
 ```bash
+# 1. Cloner le dépôt
 git clone https://github.com/lucasl0/Pokedex-s6.git
 cd Pokedex-s6/github-actions/partie-3
+
+# 2. Installer les dépendances
 npm install
-```
 
-### Configuration de l'environnement
-
-Copier le fichier `.env.example` en `.env` :
-
-```bash
+# 3. Copier le fichier d'environnement
 cp .env.example .env
-```
+# Remplir les variables dans .env
 
-Template `.env` :
-
-```env
-# Token GitHub API (ne pas commiter)
-VITE_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
-
-# Infos du depot
-VITE_GITHUB_OWNER=lucasl0
-VITE_GITHUB_REPO=Pokedex-s6
-
-# Injectes automatiquement par CI/CD
-# VITE_ACTOR=
-# VITE_BUILD_DATE=
-```
-
-> Le fichier `.env` est dans le `.gitignore` - ne jamais le commiter.
-
-### Lancer en developpement
-
-```bash
+# 4. Lancer le serveur de développement
 npm run dev
 ```
 
-### Build de production
+---
 
-```bash
-npm run build
+## ⚙️ Template fichier `.env`
+
+Copier `.env.example` → `.env` et renseigner les valeurs :
+
+```env
+# Token GitHub pour l'API (membres du groupe)
+# Ne jamais commiter ce fichier !
+VITE_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+VITE_GITHUB_OWNER=lucasl0
+VITE_GITHUB_REPO=Pokedex-s6
+
+# Informations de déploiement (injectées automatiquement par la CI)
+VITE_ACTOR=
+VITE_BUILD_DATE=
 ```
 
----
-
-## Technologies utilisees
-
-| Outil | Role |
-|---|---|
-| [Vite](https://vitejs.dev/) | Bundler et serveur de dev |
-| [TailwindCSS v4](https://tailwindcss.com/) | Styles CSS |
-| [Vitest](https://vitest.dev/) | Tests unitaires |
-| [Playwright](https://playwright.dev/) | Tests end-to-end |
-| [GitHub Actions](https://github.com/features/actions) | CI/CD |
-| [wavesurfer.js](https://wavesurfer.xyz/) | Spectre sonore du cri Pokemon |
-| rsync via SSH | Deploiement |
+> ⚠️ Le fichier `.env` ne doit **jamais** être commité. Utiliser les **GitHub Secrets** en production.
 
 ---
 
-## APIs utilisees
+## 🗄️ Schéma base de données
 
-| API | Usage |
-|---|---|
-| [Tyradex](https://tyradex.vercel.app/) | Donnees Pokemon en francais |
-| [PokeAPI](https://pokeapi.co/) | Donnees detaillees, cris, sprites |
-| [TCGdex](https://tcgdex.dev/) | Cartes Pokemon TCG |
-| [GitHub API](https://docs.github.com/fr/rest) | Liste des collaborateurs |
-
----
-
-## Schema base de donnees
-
-La base de donnees MySQL est utilisee pour stocker les jaquettes de jeux.
+La base de données est utilisée uniquement pour la gestion des **jaquettes de jeux** uploadées via `upload.php`.
 
 ```sql
-CREATE TABLE game_covers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    game_name VARCHAR(255) NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE jaquettes (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  game_name   VARCHAR(100) NOT NULL,  -- Ex: red, blue, gold...
+  filename    VARCHAR(255) NOT NULL,  -- Ex: pokemon-rouge.jpg
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-### Migration
-
-Exporter le schema :
-
-```bash
-mysqldump -u {USER} -p{PASSWORD} --no-data --no-create-db {DATABASE} > database.sql
-```
-
-Importer :
-
-```bash
-cat > .my.cnf << EOF
-[client]
-user=$MYSQL_USER
-password=$MYSQL_PASSWORD
-database=$MYSQL_DATABASE
-host=$MYSQL_SERVER
-EOF
-
-chmod 400 .my.cnf
-mysql --defaults-extra-file=.my.cnf < database.sql
-rm .my.cnf
-```
+> Si vous utilisez uniquement le système de fichiers (sans BDD), cette table est optionnelle.
 
 ---
 
-## Pipeline CI/CD
+## 🔑 Secrets GitHub à configurer
 
-Le pipeline se declenche sur `push` ou `pull_request` vers `main`.
+Dans **Settings → Secrets and variables → Actions** :
 
-```
-lint ──┐
-       ├──> build ──> e2e ──> deploy (main push uniquement)
-unit ──┘
-```
-
-### Secrets GitHub a configurer
-
-| Nom | Description |
+| Nom du secret | Description |
 |---|---|
-| `SSH_KEY` | Cle SSH privee pour le deploiement |
-| `SSH_USER` | Utilisateur SSH du serveur |
-| `SSH_SERVER` | Adresse du serveur de production |
-| `MYSQL_USER` | Utilisateur base de donnees |
-| `MYSQL_PASSWORD` | Mot de passe base de donnees |
-| `MYSQL_SERVER` | Serveur base de donnees |
-| `MYSQL_DATABASE` | Nom de la base de donnees |
-| `VITE_GITHUB_TOKEN` | Token GitHub API (ne pas commiter) |
-
-### Variables GitHub a configurer
-
-| Nom | Valeur |
-|---|---|
-| `VITE_GITHUB_OWNER` | `lucasl0` |
-| `VITE_GITHUB_REPO` | `Pokedex-s6` |
+| `VITE_GITHUB_TOKEN` | Token GitHub pour l'API collaborateurs |
+| `SSH_KEY` | Clé SSH privée pour le déploiement rsync |
+| `SSH_USER` | Nom d'utilisateur SSH du serveur |
+| `SSH_SERVER` | Adresse IP/domaine du serveur |
+| `MYSQL_USER` | Utilisateur base de données |
+| `MYSQL_PASSWORD` | Mot de passe base de données |
+| `MYSQL_SERVER` | Serveur base de données |
+| `MYSQL_DATABASE` | Nom de la base de données |
 
 ---
 
-## Tests
+## 📦 Scripts disponibles
 
 ```bash
-# Tests unitaires
-npm run test
-
-# Tests E2E
-npm run test:e2e
+npm run dev       # Serveur de développement (Vite)
+npm run build     # Build de production
+npm run lint      # Linter ESLint
+npm run test      # Tests unitaires (Vitest)
+npm run test:e2e  # Tests E2E (Playwright)
 ```
 
 ---
 
-## Securite
+## 🔄 CI/CD – Pipeline GitHub Actions
 
-- Les `.env` sont proteges via `.htaccess` genere automatiquement par le CI
-- Le token GitHub est injecte via les Secrets GitHub Actions, jamais commite
-- `VITE_ACTOR` et `VITE_BUILD_DATE` sont injectes par CI pour afficher le dernier deployeur
+Le fichier `.github/workflows/release.yml` (à la racine du dépôt) définit la pipeline :
+
+```
+[push/PR → main]
+       ↓
+   🔍 Lint (ESLint)
+       ↓
+   🧪 Tests unitaires (Vitest)  ← rapport HTML généré always()
+       ↓
+   🏗️  Build + .htaccess (.env protégé)
+       ↓
+   🎭 Tests E2E (Playwright)    ← rapport HTML si failure()
+       ↓
+   🚀 Deploy rsync SSH (main push uniquement)
+```
 
 ---
 
-## Credits
+## 🌐 APIs utilisées
 
-- APIs : [Tyradex](https://tyradex.vercel.app/), [PokeAPI](https://pokeapi.co/), [TCGdex](https://tcgdex.dev/)
-- Icones types : [pokemon-type-icons](https://github.com/duiker101/pokemon-type-icons)
-- Logo : BUT MMI - Annee universitaire 2024-2025
+| API | Usage |
+|---|---|
+| [Tyradex](https://tyradex.vercel.app/) | Données Pokémon en français |
+| [PokéAPI](https://pokeapi.co/) | Noms étrangers, cris, jeux, numéros |
+| [TCGdex](https://tcgdex.dev/) | Cartes TCG du Pokémon |
+| [API GitHub](https://docs.github.com/fr/rest) | Liste des membres du groupe |
+
+---
+
+## 🏷️ Versionnement
+
+Le projet utilise [release-it](https://github.com/release-it/release-it) pour le semantic versioning :
+
+```bash
+# Tag manuel
+git tag 1.0.0
+git push origin --tags
+
+# Ou via release-it
+npx release-it
+```
+
+> C'est la version la plus haute qui sera testée par le correcteur.

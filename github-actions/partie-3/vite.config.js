@@ -50,5 +50,11 @@ export default defineConfig({
         ],
         environment: 'happy-dom',
         css: false,
+        // Reporter HTML Vitest – génère le rapport dans ./html/
+        // Ne pas commiter ce dossier (ajouté dans .gitignore)
+        reporters: ['verbose', 'html'],
+        outputFile: {
+            html: './html/index.html',
+        },
     },
 });
